@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 
 const logSchema = new mongoose.Schema({
-  id:  String,
+  ip:  String,
   endpoint: String,
   method:   String,
   geo: Object,
-  body: Object
+  googleMaps: String,
+  body: Object,
 },
 { timestamps: true },
 );

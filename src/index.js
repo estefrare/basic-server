@@ -19,12 +19,17 @@ app.use(express.json())
 app.use(async (req, res, next) => {
   try {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    const geo = geoip.lookup(ip)
+    const latitude = geo?.ll[0]
+    const longitude = geo?.ll[1]
+
     const newLog = new Log({
       ip,
       endpoint: req.url,
       method: req.method,
       body: req.body,
-      geo: geoip.lookup(ip),
+      geo,
+      googleMaps: `https://www.google.com/maps/place/${latitude},${longitude}`,
     });
     await newLog.save();
   } catch (error) {
