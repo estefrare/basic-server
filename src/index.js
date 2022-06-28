@@ -1,12 +1,37 @@
 const express = require('express')
 const { body, validationResult } = require('express-validator')
 const cors = require('cors')
+const mongoose = require('mongoose');
+const geoip = require('geoip-lite');
+
+require('dotenv').config()
+
 const users = require('./users.json')
+const Log = require('./Log')
+
 const app = express()
 const port = process.env.PORT || 3000
 
+app.set('trust proxy', true)
 app.use(cors())
 app.use(express.json())
+
+app.use(async (req, res, next) => {
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    const newLog = new Log({
+      ip,
+      endpoint: req.url,
+      method: req.method,
+      body: req.body,
+      geo: geoip.lookup(ip),
+    });
+    await newLog.save();
+  } catch (error) {
+    console.log(error)
+  }
+  next();
+})
 
 app.post('/login',
   body('email')
@@ -36,7 +61,12 @@ app.get('/users',
     res.status(200).json({ error: false, data: users })
   }
 )
-
-app.listen(port, () => {
-  console.log(`Server app listening on port ${port}`)
-})
+mongoose.connect(process.env.DATABASE_URL)
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server app listening on port ${port}`)
+    })
+  })
+  .catch((error) => {
+    console.log(`Database Error`, error.toString())
+  })
