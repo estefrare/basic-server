@@ -7,14 +7,13 @@ Servidor API REST hecho con [Express](https://expressjs.com/en/starter/installin
 ```
 POST /login
 
-Params:
+Body:
 - email
 - password
 ```
 
 ```
 GET /users
-
 ```
 
 ### Deployment

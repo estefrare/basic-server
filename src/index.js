@@ -38,5 +38,5 @@ app.get('/users',
 )
 
 app.listen(port, () => {
-  console.log(`Trackgenix app listening on port ${port}`)
+  console.log(`Server app listening on port ${port}`)
 })
